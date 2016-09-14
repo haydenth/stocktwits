@@ -1,4 +1,5 @@
 import logging as log
+import json
 from requestors import ST_BASE_PARAMS, ST_BASE_URL
 
 
@@ -31,7 +32,7 @@ def get_stock_stream(symbol, params={}):
     all_params = ST_BASE_PARAMS.copy()
     for k, v in params.iteritems():
         all_params[k] = v
-    return R.get_json(ST_BASE_URL + 'streams/symbol/{}.json'.format(symbol), params=all_params)
+    return R().get_json(ST_BASE_URL + 'streams/symbol/{}.json'.format(symbol), params=all_params)
 
 
 def get_message_stream(wl_id, params={}):
@@ -68,6 +69,16 @@ def delete_from_watchlist(symbol, wl_id):
     else:
         return False
 
+def post_message(token, body):
+    """ posts a message to your stocktwits stream 
+    """
+    params = ST_BASE_PARAMS.copy()
+    params['body'] = body
+    resp = R().post_json(ST_BASE_URL + 'messages/create.json?access_token=' + token, params=params)
+    if resp['response']['status'] == 200:
+        return True
+    else:
+        return False
 
 def get_trending_stocks():
     """ returns list of trending stock symbols, ensuring each symbol is part of a NYSE or NASDAQ
